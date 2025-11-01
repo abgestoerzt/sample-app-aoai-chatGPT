@@ -44,6 +44,9 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   const FEEDBACK_ENABLED =
     appStateContext?.state.frontendSettings?.feedback_enabled && appStateContext?.state.isCosmosDBAvailable?.cosmosDB
   const SANITIZE_ANSWER = appStateContext?.state.frontendSettings?.sanitize_answer
+  const disclaimerEnabled = appStateContext?.state.frontendSettings?.disclaimer_enabled
+  const disclaimerText = appStateContext?.state.frontendSettings?.disclaimer_text
+  const shouldShowDisclaimerBanner = !!(disclaimerEnabled && disclaimerText)
 
   const handleChevronClick = () => {
     setChevronIsExpanded(!chevronIsExpanded)
@@ -244,6 +247,13 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   return (
     <>
       <Stack className={styles.answerContainer} tabIndex={0}>
+        {shouldShowDisclaimerBanner && (
+          <Stack.Item className={styles.disclaimerBannerWrapper}>
+            <Text role="note" className={styles.answerDisclaimerBanner}>
+              {disclaimerText}
+            </Text>
+          </Stack.Item>
+        )}
         <Stack.Item>
           <Stack horizontal grow>
             <Stack.Item grow>
@@ -323,9 +333,11 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
               </Stack>
             </Stack.Item>
           )}
-          <Stack.Item className={styles.answerDisclaimerContainer}>
-            <span className={styles.answerDisclaimer}>AI-generated content may be incorrect</span>
-          </Stack.Item>
+          {!shouldShowDisclaimerBanner && (
+            <Stack.Item className={styles.answerDisclaimerContainer}>
+              <span className={styles.answerDisclaimer}>AI-generated content may be incorrect</span>
+            </Stack.Item>
+          )}
           {!!answer.exec_results?.length && (
             <Stack.Item onKeyDown={e => (e.key === 'Enter' || e.key === ' ' ? toggleIsRefAccordionOpen() : null)}>
               <Stack style={{ width: '100%' }}>
